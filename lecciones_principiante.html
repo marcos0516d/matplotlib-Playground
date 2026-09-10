@@ -1789,6 +1789,8 @@ plt.show()</code></pre>
                 }
             }, 500);
             
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             pyodide = await loadPyodide({
                 indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
             });

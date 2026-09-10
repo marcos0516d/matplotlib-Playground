@@ -991,6 +991,8 @@ plt.show()`,
                 if (current < 90) progressBar.style.width = (current + 1) + '%';
             }, 500);
             
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
             clearInterval(progressInterval);
             progressBar.style.width = '50%';
