@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matplotlib Playground - Desafio</title>
+    <meta name="description" content="Desafios de matplotlib para poner a prueba tus conocimientos. Dashboard completo, visualizacion de datos y graficos interactivos.">
+    <meta name="keywords" content="matplotlib desafio, retos matplotlib, visualizacion datos, dashboard python, graficos interactivos">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Matplotlib Playground - Desafio">
+    <meta property="og:description" content="Pon a prueba tus conocimientos de matplotlib con desafios reales de visualizacion de datos.">
+    <meta name="twitter:card" content="summary">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --azul: #0a0a23;
+            --verde: #00d4aa;
+            --morado: #667eea;
+            --morado-claro: #764ba2;
+            --gris-claro: #f8f9fa;
+            --gris-medio: #e9ecef;
+            --texto: #333;
+            --blanco: #fff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gris-claro);
+            color: var(--texto);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--azul);
+            color: var(--blanco);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 50px;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--naranja);
+        }
+        
+        .header-steps {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+
+        .instructions-panel {
+            width: 40%;
+            min-width: 300px;
+            background: var(--blanco);
+            border-right: 2px solid var(--gris-medio);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .instructions-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gris-medio);
+            background: var(--gris-claro);
+        }
+        
+        .instructions-header h2 {
+            font-size: 1.1rem;
+            color: var(--azul);
+        }
+        
+        .instructions-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .instructions-content h3 {
+            color: var(--morado);
+            margin: 15px 0 10px;
+            font-size: 1rem;
+        }
+        
+        .instructions-content p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .instructions-content code {
+            background: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        
+        .instructions-content pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .instructions-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .editor-header {
+            padding: 10px 15px;
+            background: #282c34;
+            color: #abb2bf;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .editor-container {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .output-panel {
+            height: 220px;
+            min-height: 150px;
+            background: #1e1e1e;
+            border-top: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .output-header {
+            padding: 8px 15px;
+            background: #252526;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .output-header span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .output-clear {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .output-clear:hover {
+            background: #3c3c3c;
+            color: #fff;
+        }
+        .btn-view-plot { background: none; border: 1px solid #555; color: #888; cursor: pointer; font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; transition: all 0.2s; }
+        .btn-view-plot:hover { background: #3c3c3c; color: #fff; border-color: #888; }
+        .btn-view-plot:disabled { opacity: 0.3; cursor: not-allowed; }
+        .plot-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
+        .plot-modal-overlay.active { display: flex; }
+        .plot-modal { background: #1e1e1e; border-radius: 12px; width: 90vw; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .plot-modal-header { padding: 12px 20px; background: #252526; color: #ccc; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #444; }
+        .plot-modal-header span { font-size: 0.9rem; font-weight: 500; }
+        .plot-modal-close { background: none; border: none; color: #888; cursor: pointer; font-size: 1.3rem; padding: 4px 8px; border-radius: 4px; transition: all 0.2s; }
+        .plot-modal-close:hover { background: #3c3c3c; color: #fff; }
+        .plot-modal-body { flex: 1; overflow: auto; padding: 20px; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .plot-modal-body svg { max-width: 100%; max-height: 100%; }
+        .plot-modal-footer { padding: 10px 20px; background: #252526; border-top: 1px solid #444; display: flex; justify-content: flex-end; gap: 10px; }
+        .plot-modal-footer button { padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s; }
+        .btn-download-svg { background: var(--morado); color: white; }
+        .btn-download-svg:hover { background: var(--morado-claro); }
+        .btn-download-png { background: #27ae60; color: white; }
+        .btn-download-png:hover { background: #219a52; }
+        
+        .next-lesson-btn {
+            background: var(--verde);
+            color: var(--azul);
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .next-lesson-btn:disabled {
+            background: #3c3c3c;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .next-lesson-btn:not(:disabled):hover {
+            background: #00b894;
+        }
+        
+        .next-lesson-btn:not(:disabled) {
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px var(--verde), 0 0 10px var(--verde); }
+            50% { box-shadow: 0 0 15px var(--verde), 0 0 25px var(--verde); }
+        }
+        
+        .output-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .output-cell {
+            margin-bottom: 10px;
+            border-left: 3px solid var(--morado);
+            padding-left: 10px;
+        }
+        
+        .output-cell-prompt {
+            color: #61afef;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+        
+        .output-cell-text {
+            color: #abb2bf;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .output-cell-text.error {
+            color: #e06c75;
+        }
+        
+        .output-cell-html {
+            color: #abb2bf;
+            overflow-x: auto;
+        }
+        
+        .output-cell-html img {
+            max-width: 100%;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        
+        .output-welcome {
+            color: #61afef;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+        
+        .output-welcome span {
+            color: #98c379;
+        }
+
+        .test-panel {
+            height: 150px;
+            min-height: 100px;
+            background: #1e1e1e;
+            border-top: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .test-header {
+            padding: 8px 15px;
+            background: #252526;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .test-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .test-pass { color: #98c379; }
+        .test-fail { color: #e06c75; }
+        .test-info { color: #61afef; }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--morado);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--morado-claro);
+        }
+        
+        .btn-success {
+            background: var(--verde);
+            color: var(--azul);
+        }
+        
+        .btn-success:hover {
+            background: #00b894;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: var(--verde);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1rem;
+        }
+        
+        .loading-subtext {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .loading-progress {
+            width: 250px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--verde);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .step-nav {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            background: var(--gris-claro);
+            border-bottom: 1px solid var(--gris-medio);
+            overflow-x: auto;
+        }
+        
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gris-medio);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .step-dot.active {
+            background: var(--morado);
+            color: white;
+        }
+        
+        .step-dot.completed {
+            background: var(--verde);
+            color: var(--azul);
+        }
+        
+        .step-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            color: var(--azul);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .modal-message {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .modal-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: #e06c75;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .modal-btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            background: var(--morado);
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn:hover {
+            background: var(--morado-claro);
+        }
+        }
+
+        /* MOBILE TAB LAYOUT */
+        
+        /* RESPONSIVE OVERRIDES FOR BOOTSTRAP */
+        @media (max-width: 991px) {
+            .instructions-panel {
+                max-height: 40vh;
+                min-width: unset;
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--gris-medio);
+            }
+            .editor-panel {
+                min-height: 60vh;
+            }
+            .main-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            #mobileNav {
+                top: 65px;
+            }
+            .header-steps {
+                display: none !important;
+            }
+            .header-buttons .btn-text {
+                display: none;
+            }
+            .header-buttons .btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                transform: translateX(200vw);
+                transition: transform 0.4s ease;
+            }
+            .header-buttons .volver-btn {
+                transform: translateX(90px) !important;
+            }
+            body.output-active .header-buttons .volver-btn,
+            body.editor-active .header-buttons .volver-btn {
+                transform: translateX(0) !important;
+            }
+            body.output-active .header-buttons .btn,
+            body.editor-active .header-buttons .btn {
+                transform: translateX(0);
+            }
+            .instructions-panel {
+                max-height: none;
+                height: auto;
+                border-right: none;
+            }
+            .main-container {
+                height: auto;
+                overflow-y: auto;
+            }
+            .d-md-none.position-fixed.bottom-0 {
+                bottom: 185px !important;
+                transition: transform 0.3s ease;
+            }
+            body.output-active .d-md-none.position-fixed.bottom-0 {
+                transform: translateX(calc(100% + 60px));
+            }
+            .matplotlib-btn { }
+            body.output-active .matplotlib-btn, body.editor-active .matplotlib-btn { display: flex !important; bottom: -50px !important; right: 129px !important; width: 190px !important; height: 190px !important; opacity: 0.5; }
+            #mobileNav {
+                position: fixed;
+                top: 50px;
+                left: 0;
+                right: 0;
+                z-index: 999;
+            }
+            .main-container {
+                margin-top: 92px;
+            }
+            .editor-panel {
+                display: flex;
+                flex-direction: column;
+                height: 665px;
+                overflow: hidden;
+                position: relative;
+            }
+            .editor-container {
+                min-height: 400px;
+                height: 50vh;
+            }
+            .output-panel {
+                position: absolute;
+                bottom: 50%;
+                left: 0;
+                right: 0;
+                height: 50%;
+                transform: translateY(100%);
+                transition: transform 0.4s ease;
+                z-index: 10;
+            }
+            .test-panel {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50%;
+                transform: translateY(100%);
+                transition: transform 0.4s ease;
+                z-index: 11;
+            }
+            .panel-visible .output-panel,
+            .panel-visible .test-panel {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Bootstrap nav-tabs dark theme override */
+        #mobileNav {
+            background: var(--azul);
+        }
+        #mobileNav .nav-link {
+            color: rgba(255,255,255,0.7);
+            border: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        #mobileNav .nav-link.active {
+            color: var(--morado);
+            background: rgba(255,255,255,0.05);
+            border-bottom: 2px solid var(--morado);
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Cargando entorno de Python...</div>
+        <div class="loading-subtext" id="loadingStatus">Inicializando Pyodide</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+        </div>
+    </div>
+
+    <!-- ERROR MODAL -->
+    <div class="modal-overlay" id="errorModal">
+        <div class="modal">
+            <div class="modal-icon">&#9888;&#65039;</div>
+            <div class="modal-title">Revisa bien tu codigo</div>
+            <div class="modal-message">Algo no esta bien escrito. Revisa la sintaxis y vuelve a intentar.</div>
+            <div class="modal-details" id="modalDetails"></div>
+            <button class="modal-btn" onclick="closeModal()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="header-logo" style="text-decoration:none;"><img src="Botella_ensayo.png" alt="" style="height: 24px; vertical-align: middle; margin-right: 6px;"> Matplotlib Playground <span style="color: var(--morado);">- Desafio</span></a>
+        <div class="header-steps d-none d-sm-block" id="stepInfo">Desafio 1 de 3</div>
+        <div class="header-buttons">
+            <a href="index.html" class="btn btn-secondary volver-btn" style="text-decoration:none;"><span class="d-inline d-sm-none">&larr;</span><span class="btn-text">Volver</span></a>
+            <button class="btn btn-secondary" onclick="resetCode()">&#8635; <span class="btn-text d-none d-sm-inline">Reiniciar</span></button>
+            <button class="btn btn-primary" onclick="runTests()">&#9654; <span class="btn-text d-none d-sm-inline">Ejecutar Test</span></button>
+        </div>
+    </div>
+
+    <!-- MOBILE NAV TABS -->
+    <ul class="nav nav-tabs d-md-none" id="mobileNav">
+        <li class="nav-item">
+            <button class="nav-link active" onclick="switchTab('instructions')" type="button">&#128214; Instrucciones</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="switchTab('editor')" type="button">&#9998; Editor</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="switchTab('output')" type="button">&#128202; Resultado</button>
+        </li>
+    </ul>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- LEFT: INSTRUCTIONS -->
+        <div class="instructions-panel mobile-active" id="instructions">
+            <div class="step-nav" id="stepNav"></div>
+            <div class="instructions-header">
+                <h2 id="lessonTitle">Desafio 1: Dashboard Completo</h2>
+            </div>
+            <div class="instructions-content" id="instructionsContent"></div>
+        </div>
+
+        <!-- RIGHT: EDITOR + OUTPUT -->
+        <div class="editor-panel" id="editorPanel">
+            <div class="editor-header">
+                <span>&lt;&gt; main.py</span>
+                <span id="editorStatus">Python 3</span>
+            </div>
+            <div class="editor-container" id="editorContainer"></div>
+            
+            <div class="output-panel">
+                <div class="output-header">
+                    <span>&#128421;&#65039; Salida</span>
+                    <span id="pyodideStatus" style="font-size: 0.75rem; color: #999;">&#9203; Cargando entorno Python...</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-view-plot" id="btnViewPlot" onclick="openPlotModal()" disabled>&#128269; Ver Grafico</button>
+                        <button class="output-clear" onclick="clearOutput()">Limpiar</button>
+                        <button class="next-lesson-btn" id="nextLessonBtn" onclick="goToNextLesson()" disabled>Siguiente desafio &rarr;</button>
+                    </div>
+                </div>
+                <div class="output-container" id="outputContainer">
+                    <div class="output-welcome">&#129514; <span>Matplotlib Playground</span> - Salida</div>
+                    <div class="output-welcome" style="color: #666;">Usa plt.show() para ver graficos aqui</div>
+                </div>
+            </div>
+            
+            <div class="test-panel">
+                <div class="test-header">
+                    <span>&#129514; Resultados de Tests</span>
+                    <span id="testCount">0/0 tests pasados</span>
+                </div>
+                <div class="test-results" id="testResults">
+                    <div class="test-info">Haz clic en "Ejecutar Test" para validar tu codigo.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE ACTION BUTTONS -->
+    <div class="d-md-none position-fixed bottom-0 end-0 p-3" style="z-index: 100;display:flex;flex-direction:column;gap:10px;">
+        <button class="btn rounded-circle" onclick="window.open('https://matplotlib.org/stable/contents.html', '_blank')" style="width:48px;height:48px;font-size:1.2rem;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;display:flex;align-items:center;justify-content:center;">&#128214;</button>
+    </div>
+    <button class="d-md-none position-fixed end-0 p-3 matplotlib-btn" onclick="window.open('https://matplotlib.org/', '_blank')" style="z-index: 100;width:190px;height:190px;border:none;background:transparent;display:none;align-items:center;justify-content:center;bottom:-50px;right:129px;">
+        <img src="botella_ensayo.png" alt="Matplotlib" style="width:190px;height:190px;">
+    </button>
+
+    <!-- PLOT VIEWER MODAL -->
+    <div class="plot-modal-overlay" id="plotModal" onclick="if(event.target===this)closePlotModal()">
+        <div class="plot-modal">
+            <div class="plot-modal-header">
+                <span>&#128202; Visor de Grafico</span>
+                <button class="plot-modal-close" onclick="closePlotModal()">&times;</button>
+            </div>
+            <div class="plot-modal-body" id="plotModalBody"></div>
+            <div class="plot-modal-footer">
+                <button class="btn-download-svg" onclick="downloadSVG()">Descargar SVG</button>
+                <button class="btn-download-png" onclick="downloadPNG()">Descargar PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PYODIDE -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+    <!-- MONACO EDITOR -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- MOBILE TAB SWITCHING -->
+    <script>
+        function switchTab(tab) {
+            var instructions = document.querySelector('.instructions-panel');
+            var editorPanel = document.querySelector('.editor-panel');
+            var editorContainer = document.querySelector('.editor-container');
+            var outputPanel = document.querySelector('.output-panel');
+            var testPanel = document.querySelector('.test-panel');
+            var tabs = document.querySelectorAll('#mobileNav .nav-link');
+            
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            document.body.classList.remove('output-active');
+            document.body.classList.remove('editor-active');
+            
+            if (tab === 'instructions') {
+                tabs[0].classList.add('active');
+                instructions.style.display = 'flex';
+                editorPanel.style.display = 'none';
+                editorPanel.classList.remove('panel-visible');
+            } else if (tab === 'editor') {
+                tabs[1].classList.add('active');
+                instructions.style.display = 'none';
+                editorPanel.style.display = 'flex';
+                editorContainer.style.display = 'block';
+                editorPanel.classList.remove('panel-visible');
+                document.body.classList.add('editor-active');
+                if (window.monacoEditor) window.monacoEditor.layout();
+            } else if (tab === 'output') {
+                tabs[2].classList.add('active');
+                instructions.style.display = 'none';
+                editorPanel.style.display = 'flex';
+                editorPanel.classList.add('panel-visible');
+                document.body.classList.add('output-active');
+                if (window.monacoEditor) window.monacoEditor.layout();
+            }
+        }
+
+        if (window.innerWidth < 768) {
+            document.querySelector('.editor-panel').style.display = 'none';
+        }
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                document.querySelector('.instructions-panel').style.display = 'flex';
+                document.querySelector('.editor-panel').style.display = 'flex';
+                if (window.monacoEditor) window.monacoEditor.layout();
+            } else {
+                var activeTab = document.querySelector('#mobileNav .nav-link.active');
+                if (activeTab && activeTab.textContent.includes('Instrucciones')) {
+                    document.querySelector('.editor-panel').style.display = 'none';
+                } else {
+                    document.querySelector('.instructions-panel').style.display = 'none';
+                }
+            }
+        });
+    </script>
+
+    <script>
+        // ==================== STATE ====================
+        let pyodide = null;
+        let editor = null;
+        let currentStep = 0;
+        let completedSteps = [];
+        let cellCounter = 0;
+        let latestSvgData = '';
+
+        function openPlotModal() {
+            if (!latestSvgData) return;
+            document.getElementById('plotModalBody').innerHTML = latestSvgData;
+            document.getElementById('plotModal').classList.add('active');
+        }
+        function closePlotModal() { document.getElementById('plotModal').classList.remove('active'); }
+        function downloadSVG() {
+            if (!latestSvgData) return;
+            const blob = new Blob([latestSvgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'grafico.svg'; a.click();
+            URL.revokeObjectURL(url);
+        }
+        function downloadPNG() {
+            if (!latestSvgData) return;
+            const img = new Image();
+            const svgBlob = new Blob([latestSvgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width * 2; canvas.height = img.height * 2;
+                const ctx = canvas.getContext('2d'); ctx.scale(2, 2);
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(function(blob) {
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                    a.download = 'grafico.png'; a.click();
+                }, 'image/png');
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        }
+
+        const STORAGE_KEY = 'mplDesafioCompleted';
+
+        // ==================== CHALLENGES ====================
+        const lessons = [
+            {
+                id: 1,
+                title: "Dashboard Completo",
+                instructions: `
+                    <p>Debes crear un dashboard profesional con multiples graficos que muestre un resumen de ventas de una empresa.</p>
+                    
+                    <h3>Requisitos</h3>
+                    <ol>
+                        <li>Crear una figura con layout 2x2</li>
+                        <li><strong>Subplot 1:</strong> Grafico de lineas de ventas mensuales con titulo "Ventas Mensuales"</li>
+                        <li><strong>Subplot 2:</strong> Grafico de barras de ventas por producto con titulo "Ventas por Producto"</li>
+                        <li><strong>Subplot 3:</strong> Histograma de edades de clientes con titulo "Distribucion Edades"</li>
+                        <li><strong>Subplot 4:</strong> Grafico circular de categorias con titulo "Categorias"</li>
+                        <li>Usar plt.tight_layout() para ajustar espacios</li>
+                    </ol>
+                    
+                    <h3>Datos</h3>
+                    <pre><code>meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
+ventas = [100, 120, 110, 140, 160, 180]
+productos = ['Laptop', 'Phone', 'Tablet', 'Watch']
+ventas_prod = [45, 25, 20, 10]
+edades = np.random.randint(18, 65, 100)
+categorias = ['Tech', 'Accesorios', 'Servicios']
+porcentajes = [60, 25, 15]</code></pre>
+                `,
+                seedCode: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\nmeses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']\nventas = [100, 120, 110, 140, 160, 180]\nproductos = ['Laptop', 'Phone', 'Tablet', 'Watch']\nventas_prod = [45, 25, 20, 10]\nedades = np.random.randint(18, 65, 100)\ncategorias = ['Tech', 'Accesorios', 'Servicios']\nporcentajes = [60, 25, 15]\n\n# Crea tu dashboard aqui`,
+                solution: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\nmeses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']\nventas = [100, 120, 110, 140, 160, 180]\nproductos = ['Laptop', 'Phone', 'Tablet', 'Watch']\nventas_prod = [45, 25, 20, 10]\nedades = np.random.randint(18, 65, 100)\ncategorias = ['Tech', 'Accesorios', 'Servicios']\nporcentajes = [60, 25, 15]\n\nfig, axes = plt.subplots(2, 2, figsize=(10, 8))\n\naxes[0, 0].plot(meses, ventas, marker='o', color='blue')\naxes[0, 0].set_title('Ventas Mensuales')\naxes[0, 0].set_xlabel('Mes')\naxes[0, 0].set_ylabel('Unidades')\n\naxes[0, 1].bar(productos, ventas_prod, color=['#3498db', '#2ecc71', '#e74c3c', '#f39c12'])\naxes[0, 1].set_title('Ventas por Producto')\naxes[0, 1].set_xlabel('Producto')\naxes[0, 1].set_ylabel('Unidades')\n\naxes[1, 0].hist(edades, bins=10, color='purple', alpha=0.7)\naxes[1, 0].set_title('Distribucion Edades')\naxes[1, 0].set_xlabel('Edad')\naxes[1, 0].set_ylabel('Frecuencia')\n\naxes[1, 1].pie(porcentajes, labels=categorias, autopct='%1.1f%%')\naxes[1, 1].set_title('Categorias')\n\nplt.tight_layout()\nplt.show()`,
+                tests: [
+                    {
+                        name: "4 subplots creados",
+                        validation: `'subplots' in user_code and '2, 2' in user_code`,
+                        error: "Debes crear 4 subplots con plt.subplots(2, 2)"
+                    },
+                    {
+                        name: "Grafico de lineas",
+                        validation: `('axes[0, 0].' in user_code or 'axes[0,0].' in user_code) and 'plot' in user_code`,
+                        error: "El subplot [0,0] debe tener un grafico de lineas"
+                    },
+                    {
+                        name: "Grafico de barras",
+                        validation: `('axes[0, 1].' in user_code or 'axes[0,1].' in user_code) and 'bar' in user_code`,
+                        error: "El subplot [0,1] debe tener un grafico de barras"
+                    },
+                    {
+                        name: "Histograma",
+                        validation: `('axes[1, 0].' in user_code or 'axes[1,0].' in user_code) and 'hist' in user_code`,
+                        error: "El subplot [1,0] debe tener un histograma"
+                    },
+                    {
+                        name: "Grafico circular",
+                        validation: `('axes[1, 1].' in user_code or 'axes[1,1].' in user_code) and 'pie' in user_code`,
+                        error: "El subplot [1,1] debe tener un grafico circular"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Visualizacion de Datos",
+                instructions: `
+                    <p>Crea una visualizacion completa de datos de ventas con multiples graficos informativos.</p>
+                    
+                    <h3>Requisitos</h3>
+                    <ol>
+                        <li><strong>Grafico 1:</strong> Linea de ventas con 3 series (2022, 2023, 2024) y leyenda</li>
+                        <li><strong>Grafico 2:</strong> Barras agrupadas comparando 2 categorias</li>
+                        <li><strong>Grafico 3:</strong> Scatter plot con tamano variable (burbujas)</li>
+                        <li><strong>Grafico 4:</strong> Boxplot de 3 grupos de datos</li>
+                        <li>Cada grafico debe tener titulo y etiquetas en ejes</li>
+                    </ol>
+                    
+                    <h3>Datos</h3>
+                    <pre><code>meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
+ventas_2022 = [80, 90, 85, 100, 110, 120]
+ventas_2023 = [100, 110, 95, 120, 130, 150]
+ventas_2024 = [120, 130, 125, 150, 160, 180]</code></pre>
+                `,
+                seedCode: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\nmeses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']\nventas_2022 = [80, 90, 85, 100, 110, 120]\nventas_2023 = [100, 110, 95, 120, 130, 150]\nventas_2024 = [120, 130, 125, 150, 160, 180]\n\n# Crea tu visualizacion aqui`,
+                solution: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\nmeses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']\nventas_2022 = [80, 90, 85, 100, 110, 120]\nventas_2023 = [100, 110, 95, 120, 130, 150]\nventas_2024 = [120, 130, 125, 150, 160, 180]\n\nfig, axes = plt.subplots(2, 2, figsize=(12, 10))\n\n# Grafico 1: Lineas multiples\naxes[0, 0].plot(meses, ventas_2022, marker='o', label='2022')\naxes[0, 0].plot(meses, ventas_2023, marker='s', label='2023')\naxes[0, 0].plot(meses, ventas_2024, marker='^', label='2024')\naxes[0, 0].set_title('Ventas por Ano')\naxes[0, 0].set_xlabel('Mes')\naxes[0, 0].set_ylabel('Unidades')\naxes[0, 0].legend()\n\n# Grafico 2: Barras agrupadas\nx = np.arange(len(meses))\nwidth = 0.25\naxes[0, 1].bar(x - width, ventas_2022, width, label='2022')\naxes[0, 1].bar(x, ventas_2023, width, label='2023')\naxes[0, 1].bar(x + width, ventas_2024, width, label='2024')\naxes[0, 1].set_title('Comparativa Anual')\naxes[0, 1].set_xticks(x)\naxes[0, 1].set_xticklabels(meses)\naxes[0, 1].legend()\n\n# Grafico 3: Scatter con tamano\nnp.random.seed(42)\nx_scatter = np.random.rand(20) * 100\ny_scatter = np.random.rand(20) * 100\nsizes = np.random.rand(20) * 500\naxes[1, 0].scatter(x_scatter, y_scatter, s=sizes, alpha=0.5)\naxes[1, 0].set_title('Scatter con Tamano Variable')\naxes[1, 0].set_xlabel('Variable X')\naxes[1, 0].set_ylabel('Variable Y')\n\n# Grafico 4: Boxplot\ndata = [np.random.normal(0, std, 100) for std in range(1, 4)]\naxes[1, 1].boxplot(data)\naxes[1, 1].set_title('Distribucion de Datos')\naxes[1, 1].set_xticklabels(['Grupo A', 'Grupo B', 'Grupo C'])\n\nplt.tight_layout()\nplt.show()`,
+                tests: [
+                    {
+                        name: "4 subplots creados",
+                        validation: `'subplots' in user_code and '2, 2' in user_code`,
+                        error: "Debes crear 4 subplots con plt.subplots(2, 2)"
+                    },
+                    {
+                        name: "3 series en grafico 1",
+                        validation: `('2022' in user_code and '2023' in user_code and '2024' in user_code) or ('ventas_2022' in user_code and 'ventas_2023' in user_code and 'ventas_2024' in user_code)`,
+                        error: "El grafico 1 debe tener 3 series con leyenda"
+                    },
+                    {
+                        name: "Boxplot en grafico 4",
+                        validation: `'boxplot' in user_code`,
+                        error: "Debes incluir un boxplot en el grafico 4"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Graficos Interactivos",
+                instructions: `
+                    <p>Crea graficos avanzados con multiples caracteristicas de personalizacion.</p>
+                    
+                    <h3>Requisitos</h3>
+                    <ol>
+                        <li><strong>Grafico 1:</strong> Linea con doble eje Y (twin axes)</li>
+                        <li><strong>Grafico 2:</strong> Heatmap using imshow con datos de temperatura</li>
+                        <li><strong>Grafico 3:</strong> Area apilada (stackplot)</li>
+                        <li><strong>Grafico 4:</strong> Grafico de barras horizontales</li>
+                        <li>Personalizar colores, fuentes y estilos en todos</li>
+                    </ol>
+                `,
+                seedCode: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\ndias = range(1, 8)\ntemperatura = [22, 24, 23, 26, 25, 27, 28]\nhumedad = [65, 70, 68, 60, 62, 55, 50]\n\n# Crea tus graficos avanzados aqui`,
+                solution: `import matplotlib.pyplot as plt\nimport numpy as np\n\n# Datos\ndias = range(1, 8)\ntemperatura = [22, 24, 23, 26, 25, 27, 28]\nhumedad = [65, 70, 68, 60, 62, 55, 50]\n\nfig, axes = plt.subplots(2, 2, figsize=(12, 10))\n\n# Grafico 1: Doble eje Y\nax1 = axes[0, 0]\nax2 = ax1.twinx()\nax1.plot(list(dias), temperatura, 'b-', label='Temp')\nax2.plot(list(dias), humedad, 'r--', label='Humedad')\nax1.set_xlabel('Dia')\nax1.set_ylabel('Temperatura (°C)', color='b')\nax2.set_ylabel('Humedad (%)', color='r')\nax1.set_title('Temperatura vs Humedad')\n\n# Grafico 2: Heatmap\ndata = np.random.rand(7, 7)\nim = axes[0, 1].imshow(data, cmap='hot', aspect='auto')\naxes[0, 1].set_title('Heatmap de Temperaturas')\nplt.colorbar(im, ax=axes[0, 1])\n\n# Grafico 3: Area apilada\nx = list(range(1, 8))\ny1 = [10, 15, 13, 18, 16, 20, 22]\ny2 = [5, 8, 7, 10, 9, 12, 14]\ny3 = [3, 5, 4, 7, 6, 8, 10]\naxes[1, 0].stackplot(x, y1, y2, y3, labels=['A', 'B', 'C'])\naxes[1, 0].set_title('Ventas por Region')\naxes[1, 0].legend(loc='upper left')\n\n# Grafico 4: Barras horizontales\nproductos = ['Laptop', 'Phone', 'Tablet', 'Watch']\nventas = [45, 30, 15, 10]\naxes[1, 1].barh(productos, ventas, color=['#3498db', '#2ecc71', '#e74c3c', '#f39c12'])\naxes[1, 1].set_title('Ventas por Producto')\naxes[1, 1].set_xlabel('Unidades')\n\nplt.tight_layout()\nplt.show()`,
+                tests: [
+                    {
+                        name: "4 subplots creados",
+                        validation: `'subplots' in user_code and '2, 2' in user_code`,
+                        error: "Debes crear 4 subplots con plt.subplots(2, 2)"
+                    },
+                    {
+                        name: "Doble eje Y",
+                        validation: `'twinx' in user_code`,
+                        error: "Debes usar twinx() para doble eje Y"
+                    },
+                    {
+                        name: "Heatmap con imshow",
+                        validation: `'imshow' in user_code`,
+                        error: "Debes crear un heatmap con plt.imshow()"
+                    }
+                ]
+            }
+        ];
+
+        // ==================== PYODIDE ====================
+        async function initPyodide() {
+            const progressBar = document.getElementById('loadingProgressBar');
+            
+            updateLoadingStatus("Descargando Python y matplotlib (~60MB, solo la primera vez)...");
+            progressBar.style.width = '10%';
+            
+            const progressInterval = setInterval(() => {
+                const current = parseFloat(progressBar.style.width);
+                if (current < 90) {
+                    progressBar.style.width = (current + 1) + '%';
+                }
+            }, 500);
+            
+            pyodide = await loadPyodide({
+                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
+            });
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '50%';
+            updateLoadingStatus("Cargando matplotlib...");
+            
+            const mplProgress = setInterval(() => {
+                const current = parseFloat(progressBar.style.width);
+                if (current < 95) {
+                    progressBar.style.width = (current + 1) + '%';
+                }
+            }, 300);
+            
+            await pyodide.loadPackage(["matplotlib", "numpy"]);
+            
+            pyodide.runPython(`
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+plt.rcParams['figure.figsize'] = [8, 5]
+plt.rcParams['figure.dpi'] = 100
+            `);
+            
+            clearInterval(mplProgress);
+            progressBar.style.width = '100%';
+            updateLoadingStatus("¡Listo!");
+            
+            document.getElementById('pyodideStatus').textContent = '✅ Entorno listo';
+            document.getElementById('pyodideStatus').style.color = '#00d4aa';
+            
+            setTimeout(() => {
+                document.getElementById('pyodideStatus').textContent = '';
+                document.getElementById('pyodideStatus').style.color = '#999';
+            }, 2000);
+            
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 500);
+        }
+
+        function updateLoadingStatus(text) {
+            document.getElementById('loadingStatus').textContent = text;
+        }
+
+        // ==================== OUTPUT PANEL ====================
+        function clearOutput() {
+            const container = document.getElementById('outputContainer');
+            container.innerHTML = '';
+            cellCounter = 0;
+            latestSvgData = '';
+            document.getElementById('btnViewPlot').disabled = true;
+        }
+        
+        function writeToOutput(text, isError = false) {
+            const container = document.getElementById('outputContainer');
+            
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                if (line.trim() === '' && !isError) return;
+                cellCounter++;
+                const cell = document.createElement('div');
+                cell.className = 'output-cell';
+                
+                const prompt = document.createElement('div');
+                prompt.className = 'output-cell-prompt';
+                prompt.textContent = isError ? `Error:` : `Out [${cellCounter}]:`;
+                
+                const content = document.createElement('div');
+                content.className = 'output-cell-text' + (isError ? ' error' : '');
+                content.textContent = line;
+                
+                cell.appendChild(prompt);
+                cell.appendChild(content);
+                container.appendChild(cell);
+            });
+            
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function writePlotOutput() {
+            const container = document.getElementById('outputContainer');
+            cellCounter++;
+            
+            try {
+                const svgData = pyodide.runPython(`
+import io
+buf = io.BytesIO()
+plt.gcf().savefig(buf, format='svg', bbox_inches='tight', dpi=100)
+buf.seek(0)
+buf.read().decode('utf-8')
+                `);
+                
+                if (svgData && svgData.trim()) {
+                    latestSvgData = svgData;
+                    document.getElementById('btnViewPlot').disabled = false;
+                    const cell = document.createElement('div');
+                    cell.className = 'output-cell';
+                    cell.innerHTML = `<div class="output-cell-prompt">Out [${cellCounter}]:</div><div class="output-cell-html">${svgData}</div>`;
+                    container.appendChild(cell);
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch (e) {
+                console.error('Error rendering plot:', e);
+            }
+        }
+
+        function captureStdout(pyodide, code, showPlot = true) {
+            let output = [];
+            
+            pyodide.setStdout({
+                batched: (text) => output.push(text)
+            });
+            pyodide.setStderr({
+                batched: (text) => output.push(text)
+            });
+            
+            try {
+                pyodide.runPython(`
+import warnings
+warnings.filterwarnings('ignore')
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+plt.close('all')
+                `);
+            } catch (e) {}
+
+            try {
+                pyodide.runPython(code);
+            } catch (error) {
+                output.push(error.message);
+            }
+
+            if (showPlot) {
+                try {
+                    const hasFig = pyodide.runPython(`len(plt.get_fignums()) > 0`);
+                    if (hasFig) {
+                        writePlotOutput();
+                    }
+                } catch (e) {
+                    console.error('Error checking figure:', e);
+                }
+            }
+
+            const textOutput = output.filter(line => !line.includes('UserWarning') && !line.includes('non-GUI backend')).join('');
+            if (textOutput.trim()) {
+                writeToOutput(textOutput);
+            }
+            
+            pyodide.setStdout({
+                batched: (text) => { writeToOutput(text); }
+            });
+            pyodide.setStderr({
+                batched: (text) => { writeToOutput(text, true); }
+            });
+            
+            return output.join('');
+        }
+
+        // ==================== MONACO EDITOR ====================
+        function initMonacoEditor() {
+            require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+            
+            require(['vs/editor/editor.main'], function () {
+                editor = monaco.editor.create(document.getElementById('editorContainer'), {
+                    value: '',
+                    language: 'python',
+                    theme: 'vs-dark',
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    lineNumbers: 'on',
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 4,
+                    wordWrap: 'on'
+                });
+                window.monacoEditor = editor;
+                
+                loadLesson(currentStep);
+            });
+        }
+
+        // ==================== LESSON MANAGEMENT ====================
+        function loadLesson(index) {
+            currentStep = index;
+            const lesson = lessons[index];
+            
+            document.getElementById('lessonTitle').textContent = `Desafio ${lesson.id}: ${lesson.title}`;
+            document.getElementById('instructionsContent').innerHTML = lesson.instructions;
+            document.getElementById('stepInfo').textContent = `Desafio ${lesson.id} de ${lessons.length}`;
+            
+            if (editor) {
+                editor.setValue(lesson.seedCode);
+            }
+            
+            document.getElementById('testResults').innerHTML = '<div class="test-info">Haz clic en "Ejecutar Test" para validar tu codigo.</div>';
+            document.getElementById('testCount').textContent = '0/0 tests pasados';
+            
+            clearOutput();
+            
+            if (window.innerWidth <= 600) {
+                switchTab('instructions');
+            }
+            
+            updateStepDots();
+        }
+
+        function updateStepDots() {
+            const nav = document.getElementById('stepNav');
+            nav.innerHTML = '';
+            lessons.forEach((lesson, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'step-dot' + (i === currentStep ? ' active' : '') + (completedSteps.includes(i) ? ' completed' : '');
+                dot.textContent = lesson.id;
+                dot.onclick = () => loadLesson(i);
+                nav.appendChild(dot);
+            });
+        }
+
+        function resetCode() {
+            if (editor) {
+                editor.setValue(lessons[currentStep].seedCode);
+            }
+            clearOutput();
+            document.getElementById('testResults').innerHTML = '<div class="test-info">Codigo reiniciado. Haz clic en "Ejecutar Test" para validar.</div>';
+        }
+
+        // ==================== TEST EXECUTION ====================
+        async function runTests() {
+            if (!pyodide) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                await initPyodide();
+            }
+            
+            const code = editor.getValue();
+            const lesson = lessons[currentStep];
+            
+            document.getElementById('testResults').innerHTML = '<div class="test-info">Ejecutando codigo y validando tests...</div>';
+            
+            try {
+                pyodide.runPython('user_code = ' + JSON.stringify(code));
+                captureStdout(pyodide, code, false);
+                
+                let passed = 0;
+                let failed = 0;
+                let results = [];
+                
+                for (const test of lesson.tests) {
+                    try {
+                        if (test.code) {
+                            pyodide.runPython(test.code);
+                        }
+                        
+                        const isValid = pyodide.runPython(test.validation);
+                        
+                        if (isValid) {
+                            passed++;
+                            results.push(`<div class="test-pass">✅ ${test.name}</div>`);
+                        } else {
+                            failed++;
+                            results.push(`<div class="test-fail">❌ ${test.name}: ${test.error}</div>`);
+                        }
+                    } catch (error) {
+                        failed++;
+                        results.push(`<div class="test-fail">❌ ${test.name}: ${error.message}</div>`);
+                    }
+                }
+                
+                document.getElementById('testCount').textContent = `${passed}/${lesson.tests.length} tests pasados`;
+                document.getElementById('testResults').innerHTML = results.join('');
+                
+                if (passed === lesson.tests.length) {
+                    try {
+                        const hasFig = pyodide.runPython(`len(plt.get_fignums()) > 0`);
+                        if (hasFig) {
+                            writePlotOutput();
+                        }
+                    } catch (e) {}
+                    
+                    if (!completedSteps.includes(currentStep)) {
+                        completedSteps.push(currentStep);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(completedSteps));
+                    }
+                    document.getElementById('nextLessonBtn').disabled = false;
+                    
+                    if (currentStep < lessons.length - 1) {
+                        results.push(`<div class="test-info" style="margin-top: 10px;">🎉 ¡Todos los tests pasaron! Haz clic en "Siguiente desafio" para continuar.</div>`);
+                        document.getElementById('testResults').innerHTML = results.join('');
+                    } else {
+                        results.push(`<div class="test-info" style="margin-top: 10px;">🏆 ¡Felicidades! Has completado todos los desafios de Matplotlib Playground.</div>`);
+                        document.getElementById('testResults').innerHTML = results.join('');
+                    }
+                } else {
+                    writeToOutput('Debes completar todos los pasos marcados en la terminal de resultados para poder visualizar los graficos');
+                }
+            } catch (error) {
+                document.getElementById('testResults').innerHTML = `<div class="test-fail">Error: ${error.message}</div>`;
+            }
+        }
+
+        function goToNextLesson() {
+            if (currentStep < lessons.length - 1) {
+                window.location.href = `desafio.html?lesson=${currentStep + 1}`;
+            }
+        }
+
+        // ==================== MODAL ====================
+        function closeModal() {
+            document.getElementById('errorModal').classList.remove('active');
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                runTests();
+            }
+            if (e.key === 'Escape') { closePlotModal(); }
+        });
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            completedSteps = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const lessonParam = urlParams.get('lesson');
+            if (lessonParam !== null) currentStep = parseInt(lessonParam);
+            
+            initPyodide();
+            initMonacoEditor();
+        });
+    </script>
+</body>
+</html>
